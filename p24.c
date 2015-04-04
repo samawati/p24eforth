@@ -9,7 +9,7 @@ uint16_t clock = 0;
 uint16_t range = 0x1fff;
 
 uint32_t t = 0,    /* 25 bit */
-		 r = 0,    /* 25 bit */
+         r = 0,    /* 25 bit */
          a = 0,    /* 25 bit */
     ds[15] = {0},  /* 25 bits wide */
     rs[15] = {0},  /* 25 bits wide */
@@ -22,10 +22,10 @@ uint8_t sp = 0,    /* 8 bits */
    slot[4] = {0};  /* instruction cache 8 bits */
 
 uint32_t _t = 0,   /* 25 bit */
-		 _r = 0,   /* 25 bit */
+	 _r = 0,   /* 25 bit */
          _a = 0,   /* 25 bit */
-		 _p = 0,   /* 24 bit */
-		 _i = 0;   /* 24 bit */
+	 _p = 0,   /* 24 bit */
+	 _i = 0;   /* 24 bit */
 
 uint8_t _sp = 0,   /* 8 bits */
         _rp = 0,   /* 8 bits */
@@ -93,14 +93,14 @@ static void andd  (){ _t=((spopp()&_t)&0xffffff); };
 static void xorr  (){ _t=((spopp()^_t)&0xffffff); };
 static void ddiv  (){  
     int y = 0, x = (((ds[sp]&0xffffff)+(t&0xffffff)));
-	if ((x&0x1000000)) {
-      y = ((x&0xffffff)<<1);
-	  _a = (((a<<1)&0xffffff)+1);
+    if ((x&0x1000000)) {
+       y = ((x&0xffffff)<<1);
+       _a = (((a<<1)&0xffffff)+1);
     } else { 
-	  y = ((t&0xffffff)<<1); 
-	  _a = (((a<<1)&0xffffff));
-	}
-	_t = (a&0x800000) ? y+1 : y;
+       y = ((t&0xffffff)<<1); 
+      _a = (((a<<1)&0xffffff));
+    }
+    _t = (a&0x800000) ? y+1 : y;
 };
 static void add   (){ _t=((spopp()&0xffffff)+(_t&0xffffff)); };
 static void popr  (){ spush(rpop()); };
@@ -184,6 +184,5 @@ int main()
   FILE *f = fopen("P24.BIN", "rb");
   fread(memory, 8192, sizeof(memory[0]), f);
   mem = memory;
-  //while(getch() != 0x1b) c();
   while(1) { Sync(); Cycle(); }
 }
