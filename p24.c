@@ -15,7 +15,7 @@ uint32_t t = 0,    /* 25 bit */
     rs[15] = {0},  /* 25 bits wide */
          p = 0,    /* 24 bit */
          i = 0,    /* 24 bit */
-	      * mem;   /* 24 bits wide */
+	 * mem;   /* 24 bits wide */
 
 uint8_t sp = 0,    /* 8 bits */
         rp = 0,    /* 8 bits */
@@ -181,7 +181,7 @@ static void c() { Sync(); Cycle(); S(); }
 int main()
 {
   uint32_t memory[0x8000];
-  FILE *f = fopen("P24.BIN", "rb");
+  FILE *f = fopen("p24.bin", "rb");
   fread(memory, 8192, sizeof(memory[0]), f);
   mem = memory;
   while(1) { Sync(); Cycle(); }
