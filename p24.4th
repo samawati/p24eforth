@@ -684,10 +684,7 @@ t: .( ( -- ) 29 lit parse type t; immediate
 t: \ ( -- ) #tib @ >in ! t; immediate
 t: ( 29 lit parse 2drop t; immediate
 t: immediate =imed lit last @ @ or last @ ! t;
-t: c@ ( b -- c )
-  dup @ swap 1 lit and if
-   ffff lit and 100 lit / else ff lit and then t;
-   
+
 target.24 -order set-current
 
 tlast @        [u] context t!
