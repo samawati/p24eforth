@@ -45,7 +45,7 @@ variable tuser
      1 constant =ver
      2 constant =ext
     10 constant =base
-     2 constant =cell
+     1 constant =cell
 400000 constant =comp
 800000 constant =imed
 3fffff constant =mask
