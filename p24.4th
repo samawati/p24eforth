@@ -25,8 +25,10 @@ meta.24 +order
 
 a: asm[ ( -- ) asm.24 -order ; immediate
 
+create mask fc0000 , 3f000 , fc0 , 3f ,
 create tflash 4000 here over erase allot
 variable hi variable hw variable bi
+
 variable tdp
 
 : there tdp @ ;
@@ -35,6 +37,20 @@ variable tdp
 : t@ 2 lshift tflash + @ ;
 : t! 2 lshift tflash + ! ;
 : t, ( n -- ) there t! 1 tdp +! ;
+: tw, hw @ t@ xor ffffff and hw @ t! ;
+: ti,
+  hi @ 10 and if
+   0 hi ! there hw ! 0 t, 
+  then
+  hi @ mask + @ and tw, 4 hi +! ;
+: tc, ( c -- )
+  bi @ 0 = if
+   1 bi ! there hw ! 0 t, 10000 * tw, exit
+  then
+   bi @ 1 = if
+    2 bi ! 100 * tw, exit
+   then
+   0 bi ! tw, ;
 : talign 10 hi ! ;
 : tallot ( n -- ) tdp +! ;
 : org tdp ! talign ;
@@ -45,7 +61,7 @@ variable tuser
      1 constant =ver
      2 constant =ext
     10 constant =base
-     1 constant =cell
+     3 constant =cell
 400000 constant =comp
 800000 constant =imed
 3fffff constant =mask
@@ -59,25 +75,12 @@ variable tuser
 =em 100 - constant =tib
 =tib =us - constant =up
 
-create mask fc0000 , 3f000 , fc0 , 3f ,
-
-: #, ffffff and t, ;
-: ,w hw @ t@ xor ffffff and hw @ t! ;
-: ,i hi @ 10 and if 0 hi ! there hw ! 0 #, then
-  hi @ mask + @ and ,w 4 hi +! ;
-: b, ( c )
-  bi @ 0 = if
-   1 bi ! there hw ! 0 #, 10000 * ,w exit
-  then
-   bi @ 1 = if
-    2 bi ! 100 * ,w exit
-   then
-   0 bi ! ,w ;
 : inst
   dup 6 lshift dup 6 lshift dup 6 lshift + + +
      get-current >r asm.24 set-current create
-   r> set-current , does> @ ,i ;
+   r> set-current , does> @ ti, ;
 
+  $01 inst exit
   $0a inst ldi
   $1e inst .
 
@@ -90,7 +93,7 @@ create mask fc0000 , 3f000 , fc0 , 3f ,
 : thead
   .,
   tlast @ t, there tlast !
-     parse-word dup b, 0 do count b, loop drop ., ;
+     parse-word dup tc, 0 do count tc, loop drop ., ;
 : [t] ( -- ; <string> )
   parse-word target.24 search-wordlist 0=
     abort" [t]?" >body @ ; immediate
@@ -104,7 +107,8 @@ create mask fc0000 , 3f000 , fc0 , 3f ,
   close-file throw ;
 : compile-only =comp tlast @ t@ xor tlast @ t! ;
 : immediate =imed tlast @ t@ xor tlast @ t! ;
-: $lit ( -- ) ., [char] " word count dup b, 0 ?do count b, loop drop ., ;
+: $lit ( -- ) ., [char] " word count dup tc, 0 ?do count tc, loop drop ., ;
+: #, ffffff and t, ;
 : lit ( d -- ) [a] ldi #, ;
 : jump ( d -- ; <string> )
    get-current >r asm.24 set-current create 
@@ -120,9 +124,6 @@ create mask fc0000 , 3f000 , fc0 , 3f ,
 : t: ( -- ; <string> )
   >in @ thead >in !
    ., there create , asm.24 +order does> @ [a] call ;
-   
-  $01 inst exit
-  
 : t;
   hw @ t@ $fc0000 and 100000 = if
     hw @ dup t@ 100000 xor swap t!
@@ -622,7 +623,10 @@ t: >name ( xt -- na | f )
     1-
    else swap drop exit
    then repeat swap drop t;
-t: .id ( a -- ) ?dup if text unpack$ count $01f lit and type exit then space ."| $lit {noname}" t;
+t: .id ( a -- )
+    ?dup if
+	 text unpack$ count $01f lit and type exit 
+	then space ."| $lit {noname}" t;
 t: see ( -- ; <string> )
    ' cr
    begin
